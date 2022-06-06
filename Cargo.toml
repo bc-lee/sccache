@@ -115,6 +115,9 @@ features = [
     "winnls",
 ]
 
+[patch.crates-io]
+native-tls = { path = "vendor/native-tls" }
+
 [features]
 default = ["all"]
 all = ["dist-client", "redis", "s3", "memcached", "gcs", "azure"]
