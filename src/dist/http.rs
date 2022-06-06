@@ -300,33 +300,33 @@ mod server {
     }
 
     fn create_https_cert_and_privkey(addr: SocketAddr) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>)> {
-        let rsa_key = openssl::rsa::Rsa::<openssl::pkey::Private>::generate(2048)
+        let rsa_key = boring::rsa::Rsa::<boring::pkey::Private>::generate(2048)
             .context("failed to generate rsa privkey")?;
         let privkey_pem = rsa_key
             .private_key_to_pem()
             .context("failed to create pem from rsa privkey")?;
-        let privkey: openssl::pkey::PKey<openssl::pkey::Private> =
-            openssl::pkey::PKey::from_rsa(rsa_key)
+        let privkey: boring::pkey::PKey<boring::pkey::Private> =
+            boring::pkey::PKey::from_rsa(rsa_key)
                 .context("failed to create openssl pkey from rsa privkey")?;
         let mut builder =
-            openssl::x509::X509::builder().context("failed to create x509 builder")?;
+            boring::x509::X509::builder().context("failed to create x509 builder")?;
 
         // Populate the certificate with the necessary parts, mostly from mkcert in openssl
         builder
             .set_version(2)
             .context("failed to set x509 version")?;
-        let serial_number = openssl::bn::BigNum::from_u32(0)
+        let serial_number = boring::bn::BigNum::from_u32(0)
             .and_then(|bn| bn.to_asn1_integer())
             .context("failed to create openssl asn1 0")?;
         builder
             .set_serial_number(serial_number.as_ref())
             .context("failed to set x509 serial number")?;
-        let not_before = openssl::asn1::Asn1Time::days_from_now(0)
+        let not_before = boring::asn1::Asn1Time::days_from_now(0)
             .context("failed to create openssl not before asn1")?;
         builder
             .set_not_before(not_before.as_ref())
             .context("failed to set not before on x509")?;
-        let not_after = openssl::asn1::Asn1Time::days_from_now(365)
+        let not_after = boring::asn1::Asn1Time::days_from_now(365)
             .context("failed to create openssl not after asn1")?;
         builder
             .set_not_after(not_after.as_ref())
@@ -335,8 +335,8 @@ mod server {
             .set_pubkey(privkey.as_ref())
             .context("failed to set pubkey for x509")?;
 
-        let mut name = openssl::x509::X509Name::builder()?;
-        name.append_entry_by_nid(openssl::nid::Nid::COMMONNAME, &addr.to_string())?;
+        let mut name = boring::x509::X509Name::builder()?;
+        name.append_entry_by_nid(boring::nid::Nid::COMMONNAME, &addr.to_string())?;
         let name = name.build();
 
         builder
@@ -347,7 +347,7 @@ mod server {
             .context("failed to set issuer name")?;
 
         // Add the SubjectAlternativeName
-        let extension = openssl::x509::extension::SubjectAlternativeName::new()
+        let extension = boring::x509::extension::SubjectAlternativeName::new()
             .ip(&addr.ip().to_string())
             .build(&builder.x509v3_context(None, None))
             .context("failed to build SAN extension for x509")?;
@@ -356,7 +356,7 @@ mod server {
             .context("failed to append SAN extension for x509")?;
 
         // Add ExtendedKeyUsage
-        let ext_key_usage = openssl::x509::extension::ExtendedKeyUsage::new()
+        let ext_key_usage = boring::x509::extension::ExtendedKeyUsage::new()
             .server_auth()
             .build()
             .context("failed to build EKU extension for x509")?;
@@ -366,12 +366,12 @@ mod server {
 
         // Finish the certificate
         builder
-            .sign(&privkey, openssl::hash::MessageDigest::sha1())
+            .sign(&privkey, boring::hash::MessageDigest::sha1())
             .context("failed to sign x509 with sha1")?;
-        let cert: openssl::x509::X509 = builder.build();
+        let cert: boring::x509::X509 = builder.build();
         let cert_pem = cert.to_pem().context("failed to create pem from x509")?;
         let cert_digest = cert
-            .digest(openssl::hash::MessageDigest::sha256())
+            .digest(boring::hash::MessageDigest::sha256())
             .context("failed to create digest of x509 certificate")?
             .as_ref()
             .to_owned();

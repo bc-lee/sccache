@@ -33,11 +33,11 @@ impl Jwk {
             .context("Failed to base64 decode n")?;
         let e = base64::decode_config(&self.e, base64::URL_SAFE)
             .context("Failed to base64 decode e")?;
-        let n_bn = openssl::bn::BigNum::from_slice(&n)
+        let n_bn = boring::bn::BigNum::from_slice(&n)
             .context("Failed to create openssl bignum from n")?;
-        let e_bn = openssl::bn::BigNum::from_slice(&e)
+        let e_bn = boring::bn::BigNum::from_slice(&e)
             .context("Failed to create openssl bignum from e")?;
-        let pubkey = openssl::rsa::Rsa::from_public_components(n_bn, e_bn)
+        let pubkey = boring::rsa::Rsa::from_public_components(n_bn, e_bn)
             .context("Failed to create pubkey from n and e")?;
         let der: Vec<u8> = pubkey
             .public_key_to_der_pkcs1()

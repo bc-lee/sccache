@@ -10,7 +10,7 @@ extern crate libmount;
 #[macro_use]
 extern crate log;
 extern crate nix;
-extern crate openssl;
+extern crate boring;
 extern crate rand;
 extern crate reqwest;
 extern crate sccache;

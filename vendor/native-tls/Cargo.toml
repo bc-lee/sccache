@@ -29,7 +29,6 @@ version = "0.1"
 
 [features]
 alpn = ["security-framework/alpn"]
-vendored = ["openssl/vendored"]
 [target."cfg(any(target_os = \"macos\", target_os = \"ios\"))".dependencies.lazy_static]
 version = "1.4.0"
 
@@ -47,13 +46,10 @@ version = "3.1.0"
 [target."cfg(not(any(target_os = \"windows\", target_os = \"macos\", target_os = \"ios\")))".dependencies.log]
 version = "0.4.5"
 
-[target."cfg(not(any(target_os = \"windows\", target_os = \"macos\", target_os = \"ios\")))".dependencies.openssl]
-version = "0.10.29"
+[target."cfg(not(any(target_os = \"windows\", target_os = \"macos\", target_os = \"ios\")))".dependencies.boring]
+version = "2.0.0"
 
-[target."cfg(not(any(target_os = \"windows\", target_os = \"macos\", target_os = \"ios\")))".dependencies.openssl-probe]
-version = "0.1"
-
-[target."cfg(not(any(target_os = \"windows\", target_os = \"macos\", target_os = \"ios\")))".dependencies.openssl-sys]
-version = "0.9.55"
+[target."cfg(not(any(target_os = \"windows\", target_os = \"macos\", target_os = \"ios\")))".dependencies.boring-sys]
+version = "2.0.0"
 [target."cfg(target_os = \"windows\")".dependencies.schannel]
 version = "0.1.16"

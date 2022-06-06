@@ -1,22 +1,20 @@
-extern crate openssl;
-extern crate openssl_probe;
+extern crate boring;
 
-use self::openssl::error::ErrorStack;
-use self::openssl::hash::MessageDigest;
-use self::openssl::nid::Nid;
-use self::openssl::pkcs12::Pkcs12;
-use self::openssl::pkey::PKey;
-use self::openssl::ssl::{
+use self::boring::error::ErrorStack;
+use self::boring::hash::MessageDigest;
+use self::boring::nid::Nid;
+use self::boring::pkcs12::Pkcs12;
+use self::boring::pkey::PKey;
+use self::boring::ssl::{
     self, MidHandshakeSslStream, SslAcceptor, SslConnector, SslContextBuilder, SslMethod,
     SslVerifyMode,
 };
-use self::openssl::x509::{store::X509StoreBuilder, X509VerifyResult, X509};
+use self::boring::x509::{store::X509StoreBuilder, X509VerifyResult, X509};
 use std::error;
 use std::fmt;
 use std::io;
-use std::sync::Once;
 
-use self::openssl::pkey::Private;
+use self::boring::pkey::Private;
 use {Protocol, TlsAcceptorBuilder, TlsConnectorBuilder};
 
 #[cfg(have_min_max_version)]
@@ -25,7 +23,7 @@ fn supported_protocols(
     max: Option<Protocol>,
     ctx: &mut SslContextBuilder,
 ) -> Result<(), ErrorStack> {
-    use self::openssl::ssl::SslVersion;
+    use self::boring::ssl::SslVersion;
 
     fn cvt(p: Protocol) -> SslVersion {
         match p {
@@ -49,7 +47,7 @@ fn supported_protocols(
     max: Option<Protocol>,
     ctx: &mut SslContextBuilder,
 ) -> Result<(), ErrorStack> {
-    use self::openssl::ssl::SslOptions;
+    use self::boring::ssl::SslOptions;
 
     let no_ssl_mask = SslOptions::NO_SSLV2
         | SslOptions::NO_SSLV3
@@ -89,10 +87,10 @@ fn supported_protocols(
     Ok(())
 }
 
-fn init_trust() {
-    static ONCE: Once = Once::new();
-    ONCE.call_once(openssl_probe::init_ssl_cert_env_vars);
-}
+// fn init_trust() {
+//     static ONCE: Once = Once::new();
+//     ONCE.call_once(openssl_probe::init_ssl_cert_env_vars);
+// }
 
 #[cfg(target_os = "android")]
 fn load_android_root_certs(connector: &mut SslContextBuilder) -> Result<(), Error> {
@@ -252,7 +250,7 @@ pub struct TlsConnector {
 
 impl TlsConnector {
     pub fn new(builder: &TlsConnectorBuilder) -> Result<TlsConnector, Error> {
-        init_trust();
+        // init_trust();
 
         let mut connector = SslConnector::builder(SslMethod::tls())?;
         if let Some(ref identity) = builder.identity {
