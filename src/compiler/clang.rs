@@ -177,6 +177,7 @@ counted_array!(pub static ARGS: [ArgInfo<gcc::ArgData>; _] = [
     // Note: this overrides the -fprofile-use option in gcc.rs.
     take_arg!("-fprofile-use", PathBuf, Concatenated('='), ClangProfileUse),
     take_arg!("-fsanitize-blacklist", PathBuf, Concatenated('='), ExtraHashFile),
+    flag!("-fuse-ctor-homing", PreprocessorArgumentFlag),
     take_arg!("-gcc-toolchain", OsString, Separated, PassThrough),
     take_arg!("-include-pch", PathBuf, CanBeSeparated, PreprocessorArgumentPath),
     take_arg!("-load", PathBuf, Separated, ExtraHashFile),
@@ -457,6 +458,20 @@ mod test {
             "-no-opaque-pointers"
         );
         assert_eq!(ovec!["-Xclang", "-no-opaque-pointers"], a.preprocessor_args);
+    }
+
+
+    #[test]
+    fn test_parse_xclang_use_ctor_homing() {
+        let a = parses!(
+            "-c",
+            "foo.c",
+            "-o",
+            "foo.o",
+            "-Xclang",
+            "-fuse-ctor-homing"
+        );
+        assert_eq!(ovec!["-Xclang", "-fuse-ctor-homing"], a.preprocessor_args);
     }
 
     #[test]
